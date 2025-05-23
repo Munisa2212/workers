@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { AssignMastersToOrderDto, CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Request } from 'express';
@@ -81,9 +81,20 @@ export class OrderService {
   }
 
 
-  async findAll() {
+  async findAll(
+    limit: number,
+    page: number,
+  ) {
     try {
-      const one = await this.prisma.order.findMany()
+      const take = Number(limit);
+      const skip = (Number(page) - 1) * take;
+      const query: any = {};
+
+      const one = await this.prisma.order.findMany({
+        where: query,
+        skip,
+        take,
+      })
       return one
     } catch (error) {
       console.log(error)
@@ -122,5 +133,36 @@ export class OrderService {
       console.log(error)
       return {message: `remove order error: ${error}`}
     }
+  }
+
+  async assignMastersToOrder(dto: AssignMastersToOrderDto) {
+    const { orderId, masterIds } = dto;
+
+    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    if (!order) throw new NotFoundException(`Order ${orderId} not found`);
+
+    const masters = await this.prisma.master.findMany({
+      where: { id: { in: masterIds } },
+    });
+
+    if (masters.length !== masterIds.length) {
+      throw new NotFoundException(`One or more masters not found`);
+    }
+
+    const createdAssignments = await Promise.all(
+      masterIds.map((masterId) =>
+        this.prisma.orderMasters.create({
+          data: {
+            orderId,
+            masterId,
+          },
+        }),
+      ),
+    );
+
+    return {
+      message: 'Masters assigned to order successfully',
+      assignments: createdAssignments,
+    };
   }
 }

@@ -29,14 +29,21 @@ export class CapacityService {
       const query: any = {};
 
       if (name) {
-        query.name = name;
+        query.nameUz = name;
       }
 
       const one = await this.prisma.capacity.findMany({
         where: query,
         skip,
         take,
-        
+        include: {
+          Tools: {
+            select: {
+              nameUz: true,
+              descriptionUz: true
+            }
+          }
+        }
       })
       return one
     } catch (error) {

@@ -65,9 +65,25 @@ export class ProductService {
     }
   }
 
-  async findAll() {
+  async findAll(
+    name: string,
+    limit: number,
+    page: number,
+  ) {
     try {
-      const one = await this.prisma.product.findMany()
+      const take = Number(limit);
+      const skip = (Number(page) - 1) * take;
+      const query: any = {};
+
+      if (name) {
+        query.nameUz = name;
+      }
+
+      const one = await this.prisma.product.findMany({
+        where: query,
+        skip,
+        take,
+      })
       return one
     } catch (error) {
       console.log(error)

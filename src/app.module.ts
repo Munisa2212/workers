@@ -20,9 +20,10 @@ import { FaqModule } from './faq/faq.module';
 import { ContactModule } from './contact/contact.module';
 import { GeneralinfoModule } from './generalinfo/generalinfo.module';
 import { CommentModule } from './comment/comment.module';
+import { BasketModule } from './basket/basket.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, SmsModule, RegionModule, BrandModule, CapacityModule, SizeModule, ToolModule, MasterModule, ProductModule, LevelModule, OrderModule, SessionModule, PartnerModule, ShowcaseModule, FaqModule, ContactModule, GeneralinfoModule, CommentModule],
+  imports: [PrismaModule, UserModule, SmsModule, RegionModule, BrandModule, CapacityModule, SizeModule, ToolModule, MasterModule, ProductModule, LevelModule, OrderModule, SessionModule, PartnerModule, ShowcaseModule, FaqModule, ContactModule, GeneralinfoModule, CommentModule, BasketModule],
   controllers: [AppController],
   providers: [AppService],
 })

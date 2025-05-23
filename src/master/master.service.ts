@@ -54,8 +54,6 @@ export class MasterService {
         });
       }
       
-      const masterProducts = await this.prisma.masterProd.findMany()
-      console.log(masterProducts)
       return one
     } catch (error) {
       console.log(error)
@@ -63,10 +61,59 @@ export class MasterService {
     }
   }
 
-  async findAll() {
+  async findAll(
+    fullName: string,
+    phone: string,
+    year: number,
+    limit: number,
+    page: number,
+  ) {
     try {
-      const one = await this.prisma.master.findMany()
-      return one
+      const take = Number(limit);
+      const skip = (Number(page) - 1) * take;
+      const query: any = {};
+
+      if (fullName) {
+        query.fullName = fullName;
+      }
+
+      if (phone) {
+        query.phone = phone;
+      }
+
+      if (year) {
+        query.year = year;
+      }
+
+      const one = await this.prisma.master.findMany({
+        where: query,
+        skip,
+        take,
+        include: {
+          _count: {
+            select: { MasterRatings: true }
+          },
+          MasterRatings: {
+            select: {
+              star: true
+            }
+          }
+        }
+      })
+
+      const mastersWithAverage = one.map((master) => {
+        const ratings = master.MasterRatings;
+        const average =
+          ratings.length > 0
+            ? ratings.reduce((acc, r) => acc + r.star, 0) / ratings.length
+            : null;
+  
+        return {
+          ...master,
+          averageRating: average,
+        };
+      });
+      return mastersWithAverage
     } catch (error) {
       console.log(error)
       return {message: `find all master error: ${error}`}
@@ -104,5 +151,16 @@ export class MasterService {
       console.log(error)
       return {message: `remove master error: ${error}`}
     }
+  }
+
+  async getOrdersForMaster(masterId: number) {
+    const assignments = await this.prisma.orderMasters.findMany({
+      where: { masterId },
+      include: {
+        order: true,
+      },
+    });
+  
+    return assignments.map(a => a.order);
   }
 }

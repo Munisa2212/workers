@@ -1,6 +1,7 @@
 import { MasterDaily, paymentType } from "@prisma/client";
 import { ApiProperty } from "@nestjs/swagger";
 import {
+  ArrayNotEmpty,
   IsArray,
   IsBoolean,
   IsDate,
@@ -79,3 +80,16 @@ export class CreateOrderDto {
   withDelivery: boolean;
 }
 
+
+
+export class AssignMastersToOrderDto {
+  @ApiProperty({example: 1})
+  @IsInt()
+  orderId: number;
+
+  @ApiProperty({example: [1,2]})
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsInt({ each: true })
+  masterIds: number[];
+}

@@ -243,19 +243,16 @@ model MasterRatings {
 
 model Basket {
   id           Int         @id @default(autoincrement())
-  productId    Int
-  product      Product     @relation(fields: [productId], references: [id])
+  productId    Int?
+  product      Product?     @relation(fields: [productId], references: [id])
   productCount Int
-  quantity     Int
-  measure      Int
-  toolId       Int
-  tool         Tools       @relation(fields: [toolId], references: [id])
-  total        Int
+  toolId       Int?
+  tool         Tools?       @relation(fields: [toolId], references: [id])
   userId       Int
   user         User        @relation(fields: [userId], references: [id])
   timeUnit     MasterDaily
-  levelId      Int
-  level        Level       @relation(fields: [levelId], references: [id])
+  levelId      Int?
+  level        Level?       @relation(fields: [levelId], references: [id])
 }
 
 model GeneralInfo {

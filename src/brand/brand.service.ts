@@ -29,7 +29,7 @@ export class BrandService {
       const query: any = {};
 
       if (name) {
-        query.name = name;
+        query.nameUz = name;
       }
 
       const one = await this.prisma.brand.findMany({

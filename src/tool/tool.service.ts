@@ -56,9 +56,35 @@ export class ToolService {
     }
   }
 
-  async findAll() {
+  async findAll(
+    name: string,
+    price: number,
+    isActive: boolean,
+    limit: number,
+    page: number,
+  ) {
     try {
-      const one = await this.prisma.tools.findMany()
+      const take = Number(limit);
+      const skip = (Number(page) - 1) * take;
+      const query: any = {};
+
+      if (name) {
+        query.nameUz = name;
+      }
+
+      if (price) {
+        query.price = price;
+      }
+
+      if (isActive) {
+        query.isActive = isActive;
+      }
+
+      const one = await this.prisma.tools.findMany({
+        where: query,
+        skip,
+        take
+      })
       return one
     } catch (error) {
       console.log(error)

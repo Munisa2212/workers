@@ -27,9 +27,24 @@ export class LevelService {
     }
   }
 
-  async findAll() {
+  async findAll(
+    name: string,
+    limit: number,
+    page: number,
+  ) {
     try {
-      const one = await this.prisma.level.findMany()
+      const take = Number(limit);
+      const skip = (Number(page) - 1) * take;
+      const query: any = {};
+
+      if (name) {
+        query.nameUz = name;
+      }
+      const one = await this.prisma.level.findMany({
+        where: query,
+        skip,
+        take
+      })
       return one
     } catch (error) {
       console.log(error)

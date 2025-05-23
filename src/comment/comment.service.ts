@@ -44,19 +44,44 @@ export class CommentService {
     }
   }
 
-  findAll() {
-    return `This action returns all comment`;
+  async findAll(
+    limit: number,
+    page: number,
+  ) {
+    try {
+      const take = Number(limit);
+      const skip = (Number(page) - 1) * take;
+      const query: any = {};
+
+      const one = await this.prisma.comment.findMany({
+        where: query,
+        skip,
+        take
+      })
+      return one
+    } catch (error) {
+      console.log(error)
+      return {message: `find all ccomment error`}
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
+  async update(id: number, data: UpdateCommentDto) {
+    try {
+      const one = await this.prisma.comment.update({where: {id}, data})
+      return one
+    } catch (error) {
+      console.log(error)
+      return {message: `update ccomment error`}
+    }
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async remove(id: number) {
+    try {
+      const one = await this.prisma.comment.delete({where: {id}})
+      return one
+    } catch (error) {
+      console.log(error)
+      return {message: `remove ccomment error`}
+    }
   }
 }
