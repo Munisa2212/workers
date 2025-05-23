@@ -13,188 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       Int          @id @default(autoincrement())
-  name     String
-  password String
-  phone    String       @unique
-  email    String       @unique
-  INN      String?
-  MFO      String?
-  RS       String?
-  Bank     String?
-  OKED     String?
-  address  String
-  role     UserRole
-  status   ActiveStatus @default(PASSIVE)
-
-  Region    Region @relation(fields: [region_id], references: [id])
-  region_id Int
-
-  sessions Session[]
-
-  orders Order[]
+enum MasterDaily {
+  Daily
+  Hoursly
 }
 
-model Region {
-  id      Int     @id @default(autoincrement())
-  name_uz String
-  name_ru String?
-  name_en String?
-
-  users User[]
-}
-
-model Brand {
-  id      Int     @id @default(autoincrement())
-  name_uz String
-  name_ru String?
-  name_en String?
-}
-
-model Level {
-  id      Int     @id @default(autoincrement())
-  name_uz String
-  name_ru String?
-  name_en String?
-
-  products    Product[]
-  master_jobs Master_Job[]
-}
-
-model Capacity {
-  id      Int     @id @default(autoincrement())
-  name_uz String
-  name_ru String?
-  name_en String?
-}
-
-model Size {
-  id      Int     @id @default(autoincrement())
-  name_uz String
-  name_ru String?
-  name_en String?
-}
-
-model Product {
-  id               Int          @id @default(autoincrement())
-  status           ActiveStatus @default(PASSIVE)
-  name_uz          String
-  name_ru          String?
-  name_en          String?
-  image            String
-  min_working_hour Int
-  price_hourly     Int
-  price_daily      Int
-
-  Level    Level @relation(fields: [level_id], references: [id])
-  level_id Int
-}
-
-model Session {
-  id     Int    @id @default(autoincrement())
-  device String
-  date   String
-
-  User    User @relation(fields: [user_id], references: [id])
-  user_id Int
-}
-
-model Order {
-  id            Int          @id @default(autoincrement())
-  total         Int          @default(0)
-  location      String
-  address       String
-  date          String
-  payment_type  PaymentType
-  with_delivery Boolean
-  status        ActiveStatus
-
-  User    User @relation(fields: [user_id], references: [id])
-  user_id Int
-
-  order_items OrderItems[]
-}
-
-model OrderItems {
-  id         Int          @id @default(autoincrement())
-  product_id Int
-  level      String
-  count      Int
-  quantity   Int
-  duration   DurationType
-
-  Order    Order @relation(fields: [order_id], references: [id])
-  order_id Int
-  Tool     Tool? @relation(fields: [toolId], references: [id])
-  toolId   Int?
-}
-
-model Master {
-  id             Int          @id @default(autoincrement())
-  name           String
-  phone          String
-  status         ActiveStatus @default(PASSIVE)
-  year           Int
-  image          String
-  passport_image String
-  about          String
-
-  master_jobs Master_Job[]
-
-  stars Star[]
-}
-
-model Master_Job {
-  id                Int @id @default(autoincrement())
-  product_id        Int
-  min_working_hours Int
-
-  Level        Level @relation(fields: [level_id], references: [id])
-  level_id     Int
-  price_hourly Int
-  price_daily  Int
-  experience   Int
-
-  Master    Master @relation(fields: [master_id], references: [id])
-  master_id Int
-}
-
-model Star {
-  id      Int @id @default(autoincrement())
-  count   Int
-  user_id Int
-
-  Master    Master @relation(fields: [master_id], references: [id])
-  master_id Int
-}
-
-model Tool {
-  id             Int          @id @default(autoincrement())
-  name_uz        String
-  name_ru        String
-  name_en        String
-  description_uz String
-  description_ru String
-  description_en String
-  price          Int
-  quantity       Int
-  code           Int
-  image          String
-  status         ActiveStatus
-  Basket         Basket[]
-  orderItems     OrderItems[]
-
-}
-
-model Basket {
-  id Int @id @default(autoincrement())
-
-  Tool    Tool @relation(fields: [tool_id], references: [id])
-  tool_id Int
-}
-
-enum UserRole {
+enum userRole {
   ADMIN
   SUPER_ADMIN
   VIEWER_ADMIN
@@ -202,17 +26,295 @@ enum UserRole {
   USER_YUR
 }
 
-enum ActiveStatus {
+enum userStatus {
   ACTIVE
   PASSIVE
 }
 
-enum PaymentType {
-  ONLINE
+enum paymentType {
+  CREDIT_CARD
   CASH
 }
 
-enum DurationType {
-  DAY
-  HOUR
+model User {
+  id          Int        @id @default(autoincrement())
+  fullName    String
+  password    String
+  phoneNumber String     @unique
+  regionId    Int
+  region      Region     @relation(fields: [regionId], references: [id])
+  IIN         String?
+  MFO         String?
+  RS          String?
+  Bank        String?
+  OKED        String?
+  ADDRESS     String
+  role        userRole
+  status      userStatus
+  Basket      Basket[]
+  Comment     Comment[]
+  Order       Order[]
+}
+
+model Region {
+  id      Int    @id @default(autoincrement())
+  nameUz  String
+  nameRU  String
+  nameEng String
+  User    User[]
+}
+
+model Brand {
+  id      Int     @id @default(autoincrement())
+  nameUz  String
+  nameRU  String
+  nameEng String
+  Tools   Tools[]
+}
+
+model Capacity {
+  id      Int     @id @default(autoincrement())
+  nameUz  String
+  nameRU  String
+  nameEng String
+  Tools   Tools[]
+}
+
+model Size {
+  id      Int     @id @default(autoincrement())
+  nameUz  String
+  nameRU  String
+  nameEng String
+  Tools   Tools[]
+}
+
+model Tools {
+  id             Int             @id @default(autoincrement())
+  nameUz         String
+  nameRU         String
+  nameEng        String
+  descriptionUz  String
+  descriptionRU  String
+  descriptionEng String
+  price          Int
+  quantity       Int
+  code           String
+  image          String
+  isActive       Boolean
+  capacityId     Int
+  capacity       Capacity        @relation(fields: [capacityId], references: [id])
+  sizeId         Int
+  size           Size            @relation(fields: [sizeId], references: [id])
+  brandId        Int
+  brand          Brand           @relation(fields: [brandId], references: [id])
+  Basket         Basket[]
+  ProductTools   ProductTools[]
+  OrderTools     OrderTools[]
+}
+
+model Master {
+  id            Int             @id @default(autoincrement())
+  fullName      String
+  phone         String
+  isActive      Boolean         @default(true)
+  year          Int
+  image         String
+  passportImage String
+  about         String
+  MasterProd    MasterProd[]
+  OrderMasters  OrderMasters[]
+  MasterRatings MasterRatings[]
+}
+
+model MasterProd {
+  id             Int     @id @default(autoincrement())
+  masterId       Int
+  master         Master  @relation(fields: [masterId], references: [id])
+  productId      Int
+  product        Product @relation(fields: [productId], references: [id])
+  minWorkingHour Int
+  levelId        Int
+  level          Level   @relation(fields: [levelId], references: [id])
+  priceHourly    Int
+  priceDaily     Int
+  experience     Int
+}
+
+model Product {
+  id         Int          @id @default(autoincrement())
+  nameUz     String
+  nameRU     String
+  nameEng    String
+  image      String
+  isActive   Boolean      @default(true)
+  MasterProd MasterProd[]
+  Basket     Basket[]
+
+  productLevels ProductLevels[]
+  ProductTools  ProductTools[]
+  OrderProducts OrderProducts[]
+}
+
+model ProductLevels {
+  id             Int     @id @default(autoincrement())
+  levelId        Int
+  level          Level   @relation(fields: [levelId], references: [id])
+  productId      Int
+  product        Product @relation(fields: [productId], references: [id])
+  priceHourly    Int
+  priceDaily     Int
+  minWorkingHour Int
+}
+
+model ProductTools {
+  id        Int     @id @default(autoincrement())
+  toolId    Int
+  tool      Tools   @relation(fields: [toolId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id                Int             @id @default(autoincrement())
+  total             Int
+  location          String
+  address           String
+  date              DateTime
+  paymentType       paymentType
+  withDelivery      Boolean
+  status            userStatus    @default(ACTIVE)
+  userId            Int
+  user              User            @relation(fields: [userId], references: [id])
+  OrderProducts     OrderProducts[]
+  OrderTools        OrderTools[]
+  OrderMasters      OrderMasters[]
+  Comment           Comment[]
+}
+
+model OrderProducts {
+  id          Int         @id @default(autoincrement())
+  orderId     Int
+  order       Order       @relation(fields: [orderId], references: [id])
+  productId   Int
+  product     Product     @relation(fields: [productId], references: [id])
+  levelId     Int
+  level       Level       @relation(fields: [levelId], references: [id])
+  count       Int
+  workingTime Int
+  timeUnit    MasterDaily
+}
+
+model OrderTools {
+  id Int @id @default(autoincrement())
+
+  Order   Order @relation(fields: [orderId], references: [id])
+  orderId Int
+  Tools   Tools @relation(fields: [toolsId], references: [id])
+  toolsId Int
+  count Int
+}
+
+model OrderMasters {
+  id       Int    @id @default(autoincrement())
+  orderId  Int
+  order    Order  @relation(fields: [orderId], references: [id])
+  masterId Int
+  master   Master @relation(fields: [masterId], references: [id])
+}
+
+model Comment {
+  id            Int             @id @default(autoincrement())
+  text          String
+  userId        Int
+  user          User            @relation(fields: [userId], references: [id])
+  orderId       Int
+  order         Order           @relation(fields: [orderId], references: [id])
+  MasterRatings MasterRatings[]
+}
+
+model MasterRatings {
+  id        Int     @id @default(autoincrement())
+  star      Float
+  masterId  Int
+  commentId Int
+  comment   Comment @relation(fields: [commentId], references: [id])
+  master    Master  @relation(fields: [masterId], references: [id])
+}
+
+model Basket {
+  id           Int         @id @default(autoincrement())
+  productId    Int
+  product      Product     @relation(fields: [productId], references: [id])
+  productCount Int
+  quantity     Int
+  measure      Int
+  toolId       Int
+  tool         Tools       @relation(fields: [toolId], references: [id])
+  total        Int
+  userId       Int
+  user         User        @relation(fields: [userId], references: [id])
+  timeUnit     MasterDaily
+  levelId      Int
+  level        Level       @relation(fields: [levelId], references: [id])
+}
+
+model GeneralInfo {
+  id    Int    @id @default(autoincrement())
+  email String
+  links String
+  phone String
+}
+
+model Contact {
+  id      Int    @id @default(autoincrement())
+  name    String
+  surName String
+  phone   String
+  address String
+  message String
+}
+
+model FAQ {
+  id       Int    @id @default(autoincrement())
+  question String
+  answer   String
+}
+
+model showCase {
+  id             Int    @id @default(autoincrement())
+  nameUz         String
+  nameRU         String
+  nameEng        String
+  descriptionUz  String
+  descriptionRU  String
+  descriptionEng String
+  image          String
+  link           String
+}
+
+model Partners {
+  id      Int    @id @default(autoincrement())
+  nameUz  String
+  nameRU  String
+  nameEng String
+  image   String
+}
+
+model Session {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  ipAddress String?
+  device    String
+}
+
+model Level {
+  id      Int    @id @default(autoincrement())
+  nameUz  String
+  nameRU  String
+  nameEng String
+
+  MasterProd    MasterProd[]
+  productLevels ProductLevels[]
+  OrderProducts OrderProducts[]
+  Basket        Basket[]
 }

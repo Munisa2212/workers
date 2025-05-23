@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Tools" ALTER COLUMN "code" SET DATA TYPE TEXT;
