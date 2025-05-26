@@ -57,10 +57,4 @@ export class UserController {
     return this.userService.update(req, updateUserDto);
   }
 
-  @Roles(userRole.ADMIN, userRole.SUPER_ADMIN)
-  @UseGuards(AuthGuard)
-  @Delete("remove-user/:id")
-  removeUser(@Param("id") id: number) {
-    return this.userService.removeUser(id);
-  }
 }

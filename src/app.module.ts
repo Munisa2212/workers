@@ -21,10 +21,16 @@ import { ContactModule } from './contact/contact.module';
 import { GeneralinfoModule } from './generalinfo/generalinfo.module';
 import { CommentModule } from './comment/comment.module';
 import { BasketModule } from './basket/basket.module';
+import { MailModule } from './mail/mail.module';
+import { MulterController } from './multer/multer.controller';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
-  imports: [PrismaModule, UserModule, SmsModule, RegionModule, BrandModule, CapacityModule, SizeModule, ToolModule, MasterModule, ProductModule, LevelModule, OrderModule, SessionModule, PartnerModule, ShowcaseModule, FaqModule, ContactModule, GeneralinfoModule, CommentModule, BasketModule],
-  controllers: [AppController],
+  imports: [PrismaModule, UserModule, SmsModule, RegionModule, BrandModule, CapacityModule, SizeModule, ToolModule, MasterModule, ProductModule, LevelModule, OrderModule, SessionModule, PartnerModule, ShowcaseModule, FaqModule, ContactModule, GeneralinfoModule, CommentModule, BasketModule, MailModule, ServeStaticModule.forRoot({
+    rootPath: join(__dirname, '..', 'uploads'),
+    serveRoot: '/file'})],
+  controllers: [AppController, MulterController],
   providers: [AppService],
 })
 export class AppModule {}

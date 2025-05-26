@@ -53,6 +53,10 @@ export class RegisterUserDto {
     @ApiProperty({ example: 'USER', enum: userRole })
     @IsEnum(userRole)
     role: userRole;
+
+    @ApiProperty({example: "ibodullayevamunisa570@gmail.com"})
+    @IsString()
+    email: string
   }
   
 
@@ -60,6 +64,10 @@ export class RegisterUserDto {
     @ApiProperty({ example: '+998901234567' })
     @IsString()
     phoneNumber: string;
+
+    @ApiProperty({example: "ibodullayevamunisa570@gmail.com"})
+    @IsString()
+    email: string
   }
   
 
@@ -67,6 +75,10 @@ export class RegisterUserDto {
     @ApiProperty({ example: '+998901234567' })
     @IsString()
     phoneNumber: string;
+
+    @ApiProperty({example: "ibodullayevamunisa570@gmail.com"})
+    @IsString()
+    email: string
   
     @ApiProperty({ example: '123456' })
     @IsString()
@@ -78,6 +90,10 @@ export class RegisterUserDto {
     @ApiProperty({ example: '+998901234567' })
     @IsString()
     phoneNumber: string;
+
+    @ApiProperty({example: "ibodullayevamunisa570@gmail.com"})
+    @IsString()
+    email: string
   
     @ApiProperty({ example: 'StrongPassword123!' })
     @IsString()

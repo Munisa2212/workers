@@ -7,6 +7,8 @@ import {totp} from "otplib"
 import { SmsService } from 'src/sms/sms.service';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { MailService } from 'src/mail/mail.service';
+totp.options = {step: 200000}
 
 @Injectable()
 export class UserService {
@@ -14,7 +16,8 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService, 
     private readonly SMS: SmsService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private readonly mailer: MailService
   ){}
 
   async findUser(phoneNumber: string){
@@ -32,6 +35,10 @@ export class UserService {
       if(!region){
         return {message: "You choose region that is not exists"}
       }
+      const userEmail = await this.prisma.user.findFirst({where: {email: data.email}})
+      if(userEmail){
+        return {message: `You have already account`}
+      }
 
       const hash = bcrypt.hashSync(data.password, 10)
       const one = await this.prisma.user.create({
@@ -48,6 +55,7 @@ export class UserService {
           ADDRESS: data.ADDRESS,
           role: data.role,
           status: "PASSIVE",
+          email: data.email
         }
       })
       return one
@@ -63,10 +71,16 @@ export class UserService {
       if(!user){
         return {message: "You have to register first. Please register"}
       }
+
+      const userEmail = await this.prisma.user.findFirst({where: {email: data.email}})
+      if(!user){
+        return {message: "You have to register first. Please register"}
+      }
       
       let otp = totp.generate(data.phoneNumber + "phone")
       console.log(otp, "this is your otp")
-      // await this.SMS.sendSMS(data.phoneNumber, "Bu Eskiz dan Test")
+      await this.SMS.sendSMS(data.phoneNumber, "Bu Eskiz dan Test")
+      await this.mailer.sendMail(data.email, "One Time Password", otp)
       return {message: "Your One Time Password is sended."}
     } catch (error) {
       console.log(error)
@@ -80,6 +94,12 @@ export class UserService {
       if(!user){
         return {message: "You have to register first. Please register"}
       }
+
+      const userEmail = await this.prisma.user.findFirst({where: {email: data.email}})
+      if(!user){
+        return {message: "You have to register first. Please register"}
+      }
+      
 
       let match = totp.verify({token: data.otp, secret: data.phoneNumber + "phone"})
       if(!match){
@@ -101,6 +121,11 @@ export class UserService {
   async login(data: LoginUserDto, req: Request){
     try {
       const user = await this.findUser(data.phoneNumber)
+      if(!user){
+        return {message: "You have to register first. Please register"}
+      }
+
+      const userEmail = await this.prisma.user.findFirst({where: {email: data.email}})
       if(!user){
         return {message: "You have to register first. Please register"}
       }
@@ -140,6 +165,7 @@ export class UserService {
       let otp = totp.generate(data.phoneNumber + "phone")
       console.log(otp, "your one time password")
       await this.SMS.sendSMS(data.phoneNumber, "Bu Eskiz dan Test")
+      await this.mailer.sendMail(data.email, "One Time Password", otp)
       return {message: "Your One Time Password is sended"}
     } catch (error) {
       console.log(error)
@@ -182,13 +208,4 @@ export class UserService {
     }
   }
 
-  async removeUser(id: number){
-    try {
-      const one = await this.prisma.user.delete({where: {id: Number(id)}})
-      return one
-    } catch (error) {
-      console.log(error)
-      return {message: `remove user error: ${error}`}
-    }
-  }
 }

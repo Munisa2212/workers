@@ -4,9 +4,10 @@ import { UserController } from './user.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SmsModule } from 'src/sms/sms.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-  imports: [SmsModule, JwtModule.register({
+  imports: [MailModule, SmsModule, JwtModule.register({
     global: true,
     secret: "Nisa",
     signOptions: { expiresIn: '60d' },
