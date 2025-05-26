@@ -12,6 +12,22 @@ export class BasketService {
   async create(data: CreateBasketDto, req: Request) {
     try {
       const id = req["user-id"]
+
+      const product = await this.prisma.product.findFirst({where: {id: data.productId}})
+      if(!product){
+        return {message: `Product not found with id ${data.productId}`}
+      }
+
+      const tool = await this.prisma.tools.findFirst({where: {id: data.toolId}})
+      if(!tool){
+        return {message: `Tool not found with id ${data.toolId}`}
+      }
+
+      const level = await this.prisma.level.findFirst({where: {id: data.levelId}})
+      if(!level){
+        return {message: `Level not found with id ${data.levelId}`}
+      }
+
       const one = await this.prisma.basket.create({data: {
         productId: data.productId,
         productCount: data.productCount,
@@ -31,14 +47,15 @@ export class BasketService {
   async findAll(
     limit: number,
     page: number,
+    req: Request
   ) {
     try {
+      const id = req["user-id"]
       const take = Number(limit);
       const skip = (Number(page) - 1) * take;
-      const query: any = {};
 
       const one = await this.prisma.basket.findMany({
-        where: query,
+        where: {id: id},
         skip,
         take
       })

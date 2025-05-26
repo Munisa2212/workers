@@ -12,7 +12,7 @@ export class SessionService {
   async findAll(req: Request) {
     try {
       const id = req["user-id"]
-      const one = await this.prisma.session.findMany({where: {id}})
+      const one = await this.prisma.session.findMany({where: {userId: id}})
       return one
     } catch (error) {
       console.log(error)
@@ -24,8 +24,8 @@ export class SessionService {
     try {
       const id = req["user-id"]
       const one = await this.prisma.session.findFirst({where: {id}})
-      if(one?.userId !== id){
-        return {message: `You cannot change others' session`}
+      if(one?.userId != id){
+        return {message: `You cannot remove others' session`}
       }
       const deleted = await this.prisma.session.delete({where: {id}})
       return deleted

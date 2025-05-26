@@ -66,7 +66,7 @@ export class UserService {
       
       let otp = totp.generate(data.phoneNumber + "phone")
       console.log(otp, "this is your otp")
-      await this.SMS.sendSMS(data.phoneNumber, "Bu Eskiz dan Test")
+      // await this.SMS.sendSMS(data.phoneNumber, "Bu Eskiz dan Test")
       return {message: "Your One Time Password is sended."}
     } catch (error) {
       console.log(error)
@@ -139,7 +139,7 @@ export class UserService {
 
       let otp = totp.generate(data.phoneNumber + "phone")
       console.log(otp, "your one time password")
-      // await this.SMS.sendSMS(data.phoneNumber, "Bu Eskiz dan Test")
+      await this.SMS.sendSMS(data.phoneNumber, "Bu Eskiz dan Test")
       return {message: "Your One Time Password is sended"}
     } catch (error) {
       console.log(error)
@@ -182,20 +182,9 @@ export class UserService {
     }
   }
 
-  async remove(req: Request) {
-    try {
-      let id = req["user-id"]
-      const one = await this.prisma.user.delete({where: {id}})
-      return one
-    } catch (error) {
-      console.log(error)
-      return {message: `logout error: ${error}`}
-    }
-  }
-
   async removeUser(id: number){
     try {
-      const one = await this.prisma.user.delete({where: {id}})
+      const one = await this.prisma.user.delete({where: {id: Number(id)}})
       return one
     } catch (error) {
       console.log(error)

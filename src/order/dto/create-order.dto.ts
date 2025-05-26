@@ -55,6 +55,7 @@ export class CreateOrderDto {
 
   @ApiProperty({ example: 8 })
   @IsNumber()
+  @IsNotEmpty()
   workingTime: number;
 
   @ApiProperty({ enum: MasterDaily })
@@ -93,3 +94,4 @@ export class AssignMastersToOrderDto {
   @IsInt({ each: true })
   masterIds: number[];
 }
+

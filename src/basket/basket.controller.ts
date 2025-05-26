@@ -16,26 +16,31 @@ export class BasketController {
     return this.basketService.create(createBasketDto, req);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   findAll(
     @Query('limit') limit: number = 10,
     @Query('page') page: number = 1,
+    @Req() req: Request
   ) {
-    return this.basketService.findAll(limit, page);
+    return this.basketService.findAll(limit, page, req);
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.basketService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBasketDto: UpdateBasketDto) {
     return this.basketService.update(+id, updateBasketDto);
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.basketService.remove(+id);

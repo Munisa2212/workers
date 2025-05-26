@@ -161,6 +161,6 @@ export class MasterService {
       },
     });
   
-    return assignments.map(a => a.order);
+    return assignments;
   }
 }

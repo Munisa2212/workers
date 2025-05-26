@@ -4,6 +4,8 @@ import { LoginUserDto, PhoneCheckDto, RegisterUserDto, VerifyOtpDto } from './dt
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from './decorators/rbuc.decorators';
+import { userRole } from '@prisma/client';
 
 @Controller('user')
 export class UserController {
@@ -40,24 +42,23 @@ export class UserController {
     return this.userService.me(req);
   }
 
+  @Roles(userRole.ADMIN)
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.userService.findAll();
   }
 
 
+  @Roles(userRole.ADMIN, userRole.SUPER_ADMIN)
   @UseGuards(AuthGuard)
   @Patch()
   update(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(req, updateUserDto);
   }
 
+  @Roles(userRole.ADMIN, userRole.SUPER_ADMIN)
   @UseGuards(AuthGuard)
-  @Delete("logout")
-  remove(@Req() req: Request) {
-    return this.userService.remove(req);
-  }
-
   @Delete("remove-user/:id")
   removeUser(@Param("id") id: number) {
     return this.userService.removeUser(id);
